@@ -73,7 +73,6 @@ def update_bbdd(df:pd.DataFrame):
 
 def main():
 
-    # prueba de commit
     df_to_update = get_df()
     df_updated = update_df(df=df_to_update)
     update_bbdd(df=df_updated)
@@ -81,5 +80,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-
+# Nuevo comentario 17 mayo 2024
 
