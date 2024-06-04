@@ -35,6 +35,8 @@ def update_bbdd(conn:mysql_connector,df:pd.DataFrame):
         print(f"Error al actualizar la tabla MySQL: {e}")
 
 
+#### INICIO SOFTWARE #####
+
 conexion=mysql_connector(database_name='clientes_furgonetas')
 df_to_update = get_df(conn=conexion)
 df_updated = update_df(df=df_to_update)
