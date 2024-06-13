@@ -10,7 +10,7 @@ class mysql_connector():
             password='admin',
             database=database_name
         )
-    # Aquí iría el get_df
+
     def close(self):
         self.conn.close()
 
@@ -22,12 +22,15 @@ class mysql_connector():
 # añadir al connector una funcion que se llamará get_df que va a recibir una query (str) y va a devolver un df
 
 # 1 paso: incluir función a objeto
-# 2 definir variables de entrada y salida
-# 3 desarrollar la función 
-
-    def get_df (self, query:str) -> pd.DataFrame:
+ 
+    # Creamos la función q va a recibir una query (str) y va a devolver un df
+    def get_df (self, query:str) -> pd.DataFrame: # Definimos variables de Entrada y Salida
         df=pd.read_sql(query,self.conn)
         return df
+    
+    # Ahora tendremos q añadir esta función al código donde la vamos a usar 
+    # (dentro del archivo update_bbdd.py)
 
-            
-        
+    def get_df(self, query:str)-> pd.DataFrame:
+        df=pd.read_sql(query,self.conn)  
+        return df
