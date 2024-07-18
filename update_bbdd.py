@@ -49,15 +49,36 @@ def insert_url_new_product(conn:mysql_connector):
             print('La url se ha añadido correctamente')
             conn.close()
             
-def importes_cliente(df:pd.DataFrame):
-    df.set_index('nombre_producto', inplace=True)
+def show_graphics(conn:mysql_connector,query:str)->pd.DataFrame:
+    df=conn.cursor.execute(query)
+    df.set_index('dni', inplace=True)
     ax = df.plot(kind='bar', figsize=(10, 6), colormap='viridis')
-
-
+    plt.title('productos pedidos por cliente')
+    plt.xlabel('dni')
+    plt.ylabel('total_compras')
+    plt.xticks(rotation=45)
+    
+    for container in ax.containers:
+        ax.bar_label(container)
+        
+    plt.tight_layout()
+    plt.show()
+    
+    return df
+    
 conexion=mysql_connector(database_name='clientes_furgonetas')
 
 df_to_update = get_df(conn=conexion)
 df_updated = update_df(df=df_to_update)
 update_bbdd(conn=conexion, df=df_updated)
+query_total_compras=(
+    '''
+    SELECT clientes.nombre, clientes.dni, SUM(productos.precio) AS total_compras
+    FROM clientes
+    JOIN pedidos ON clientes.dni = pedidos.dni
+    JOIN productos ON pedidos.id_producto = productos.id
+    GROUP BY clientes.dni, clientes.nombre;
+'''
+)
 
 conexion.close()
