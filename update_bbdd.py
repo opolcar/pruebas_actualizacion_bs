@@ -3,9 +3,10 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
 from source.mysql_connector import mysql_connector
+import matplotlib.pyplot as plt
 
 def get_df(conn:mysql_connector)->pd.DataFrame:
-    query = "SELECT * FROM productos_jamones"
+    query = "SELECT * FROM productos"
     df = conn.get_df(query=query)
     return df
 
@@ -28,33 +29,35 @@ def update_df(df:pd.DataFrame)->pd.DataFrame:
 def update_bbdd(conn:mysql_connector,df:pd.DataFrame):
     try:
         for index, row in df.iterrows():
-            query=f"UPDATE productos_jamones SET nombre_producto = '{row['nombre_producto']}', precio = {row['precio']}, update_date= '{row['update_date']}' WHERE url = '{row['url']}'"
+            query=f"UPDATE productos SET nombre_producto = '{row['nombre_producto']}', precio = {row['precio']}, update_date= '{row['update_date']}' WHERE url = '{row['url']}'"
             conn.execute_query(query=query)
         print("Datos actualizados en la tabla MySQL exitosamente.")
     except Exception as e:
         print(f"Error al actualizar la tabla MySQL: {e}")
 
-def insert_url_new_product(conn:mysql_connector, df:pd.DataFrame):
+def insert_url_new_product(conn:mysql_connector):
     r=input("¿Deseas añadir otro producto para extraer datos? Pulsa 'S' para sí o 'N' para no -> ")
     if r.upper() == 'S':
         url=input("Pega aquí la nueva url -> ")
-        if url in df.iterrows(url):
+        query_check=f"SELECT COUNT(*) as check_urls FROM productos WHERE url = '{url}'"
+        df=conn.get_df(query_check)
+        if df.iloc[0]['check_urls']>0:
             print('La url ya existe')
         else:
+            query_insert = f"INSERT INTO productos (url) VALUES ('{url}')"
+            conn.execute_query(query_insert)
+            print('La url se ha añadido correctamente')
+            conn.close()
             
-        query_comprobacion=
-        #query=f"INSERT INTO productos_jamones (url) VALUES ('{url}')"
-        #conn.execute_query(query)      
-    else:
-        print('No se añadirán más datos de nuevos productos')
-        
-#### INICIO SOFTWARE #####
+def importes_cliente(df:pd.DataFrame):
+    df.set_index('nombre_producto', inplace=True)
+    ax = df.plot(kind='bar', figsize=(10, 6), colormap='viridis')
 
 
 conexion=mysql_connector(database_name='clientes_furgonetas')
 
-nuevo_producto=insert_url_new_product(conn=conexion)
 df_to_update = get_df(conn=conexion)
 df_updated = update_df(df=df_to_update)
 update_bbdd(conn=conexion, df=df_updated)
+
 conexion.close()
