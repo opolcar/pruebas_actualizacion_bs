@@ -19,18 +19,13 @@ class mysql_connector():
         cursor.execute(query)
         self.conn.commit()
 
-# añadir al connector una funcion que se llamará get_df que va a recibir una query (str) y va a devolver un df
-
-# 1 paso: incluir función a objeto
- 
-    # Creamos la función q va a recibir una query (str) y va a devolver un df
-    def get_df (self, query:str) -> pd.DataFrame: # Definimos variables de Entrada y Salida
+    def get_df (self, query:str) -> pd.DataFrame:
         df=pd.read_sql(query,self.conn)
         return df
     
-    # Ahora tendremos q añadir esta función al código donde la vamos a usar 
-    # (dentro del archivo update_bbdd.py)
-
-    def get_df(self, query:str)-> pd.DataFrame:
-        df=pd.read_sql(query,self.conn)  
-        return df
+    def change_table(self, old_table:str, new_table:str):
+        rename=f"RENAME TABLE {old_table} TO {new_table} "
+        cursor = self.conn.cursor()
+        cursor.execute(rename)
+        print(f"Table '{old_table}' renombrada a '{new_table}' correctamente.")
+        self.conn.commit()
