@@ -64,22 +64,6 @@ def show_graphics(conn:mysql_connector,query:str):
     plt.tight_layout()
     plt.show()
 
-
-
-# df_to_update = get_df(conn=conexion)
-# df_updated = update_df(df=df_to_update)
-# update_bbdd(conn=conexion, df=df_updated)
-# query_total_compras=(
-#     '''
-#     SELECT clientes.dni, SUM(productos.precio) AS total_compras
-#     FROM clientes
-#     JOIN pedidos ON clientes.dni = pedidos.dni
-#     JOIN productos ON pedidos.id_producto = productos.id
-#     GROUP BY clientes.dni;
-#     '''
-# )
-# show_graphics(conn=conexion, query=query_total_compras)
-
 def reminder_old_buyer(conn:mysql_connector):
     extract_old_buyer='''
     SELECT DISTINCT clientes.dni, clientes.nombre, clientes.email
@@ -101,4 +85,19 @@ def reminder_old_buyer(conn:mysql_connector):
 
 conexion=mysql_connector(database_name='clientes_furgonetas')
 reminder_old_buyer(conn=conexion)
+
+# df_to_update = get_df(conn=conexion)
+# df_updated = update_df(df=df_to_update)
+# update_bbdd(conn=conexion, df=df_updated)
+# query_total_compras=(
+#     '''
+#     SELECT clientes.dni, SUM(productos.precio) AS total_compras
+#     FROM clientes
+#     JOIN pedidos ON clientes.dni = pedidos.dni
+#     JOIN productos ON pedidos.id_producto = productos.id
+#     GROUP BY clientes.dni;
+#     '''
+# )
+# show_graphics(conn=conexion, query=query_total_compras)
+
 conexion.close()
