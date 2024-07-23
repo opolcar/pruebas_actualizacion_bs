@@ -63,21 +63,42 @@ def show_graphics(conn:mysql_connector,query:str):
         
     plt.tight_layout()
     plt.show()
-    
-conexion=mysql_connector(database_name='clientes_furgonetas')
+
+
 
 # df_to_update = get_df(conn=conexion)
 # df_updated = update_df(df=df_to_update)
 # update_bbdd(conn=conexion, df=df_updated)
-query_total_compras=(
-    '''
-    SELECT clientes.dni, SUM(productos.precio) AS total_compras
-    FROM clientes
-    JOIN pedidos ON clientes.dni = pedidos.dni
-    JOIN productos ON pedidos.id_producto = productos.id
-    GROUP BY clientes.dni;
-    '''
-)
-show_graphics(conn=conexion, query=query_total_compras)
+# query_total_compras=(
+#     '''
+#     SELECT clientes.dni, SUM(productos.precio) AS total_compras
+#     FROM clientes
+#     JOIN pedidos ON clientes.dni = pedidos.dni
+#     JOIN productos ON pedidos.id_producto = productos.id
+#     GROUP BY clientes.dni;
+#     '''
+# )
+# show_graphics(conn=conexion, query=query_total_compras)
 
+def reminder_old_buyer(conn:mysql_connector):
+    extract_old_buyer='''
+    SELECT DISTINCT clientes.dni, clientes.nombre, clientes.email
+    FROM clientes 
+        LEFT JOIN (
+        SELECT dni
+        FROM pedidos
+        WHERE fecha_venta > DATE_SUB(CURDATE(), INTERVAL 2 MONTH)
+    ) recientes ON clientes.dni = recientes.dni
+    WHERE recientes.dni IS NULL
+    ;
+    '''
+    df=conn.get_df(query=extract_old_buyer)
+    for index, row in df.iterrows():
+        nombre=row['nombre']
+        email=row['email']
+        mensaje = f'Hola {nombre}, vemos que hace tiempo no compras en nuestra tienda. Te dejamos por aquí nuevas promociones que pueden interesarte.'
+        print(f'Email enviado a {email} -> {mensaje}')
+
+conexion=mysql_connector(database_name='clientes_furgonetas')
+reminder_old_buyer(conn=conexion)
 conexion.close()
